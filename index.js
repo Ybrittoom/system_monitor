@@ -43,18 +43,34 @@ async function showMenu() {
             break;
 
         case '4-Temperatura':
-            exec("sensors | grep 'Package id 0'", (err, stdout) => {
-                if (err) {
-                    console.log(chalk.red("Erro ao obter a temperatura. Verifique se o 'lm-sensors' está instalado."));
-                } else {
-                    console.log(chalk.yellow(`\nTemperatura:\n${stdout.trim()}`));
-                }
-            })
-
-        case '5-Uso da CPU':
-            console.log(chalk.magenta(`\nCPU: ${os.cpus()[0].model}`))
-            console.log(chalk.magenta(`\Nucleos: ${os.cpus().length}`))
+            exec("sensors | grep 'Package id 0' | awk '{print $4}' | tr -d '+'", (err, stdout) => {
+                if (err) console.log(chalk.red('Erro ao obter a temperatura.'));
+                else console.log(chalk.magenta(`\nTemperatura: ${stdout.trim()}°C`));
+            });
             break
+
+            case '5-Uso da CPU':
+                exec("top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'", (err, stdout) => {
+                    if (err) {
+                        console.log(chalk.red('Erro ao obter uso da CPU.'));
+                    } else {
+                        const usoCPU = parseFloat(stdout.trim());
+    
+                        console.log(chalk.blue(`\nCPU: ${os.cpus()[0].model}`));
+                        console.log(chalk.blue(`Núcleos: ${os.cpus().length}`));
+                        console.log(chalk.green(`Uso da CPU: ${usoCPU}%`));
+    
+                        // Verifica o nível de uso da CPU
+                        if (usoCPU >= 70 && usoCPU <= 100) {
+                            console.log(chalk.redBright('O uso da CPU está alto! 🚨'));
+                        } else if (usoCPU >= 50 && usoCPU < 70) {
+                            console.log(chalk.yellow('O uso da CPU está mediano. ⚠️'));
+                        } else {
+                            console.log(chalk.green('O uso da CPU está normal. ✅'));
+                        }
+                    }
+                });
+                break;
         case '6-Processos em Execuçao':
             exec('ps aux --sort=-%mem | head -10', (err, stdout) => {
                 if (err) console.error(chalk.red('Erro ao obter processos.'))
