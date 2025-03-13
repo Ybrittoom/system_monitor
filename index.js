@@ -9,6 +9,52 @@ import figlet from 'figlet';
 //esse codigo serve pra exibir no terminal tudo estilizado 
 console.log(chalk.blue(figlet.textSync("System Monitor", { horizontalLayout: 'full'})))
 
+async function escolherSistema() {
+    console.log('Bem vindo ao SYSTEM MONITOR')
+    console.log('Escolha o seu sistema operacional (windows/linux)')
+
+    const { option } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'option',
+            message: "Escolha o seu sistema operacional (windows/linux)",
+            choices: [
+                'WINDOWS',
+                'LINUX'
+            ]
+        }
+    ])
+
+    switch (option) {
+        case 'WINDOWS':
+            console.log('Adpatando programa para windows')
+            break
+
+            case 'LINUX':
+    console.log('Adpatando programa para linux');
+    let i = 0;
+    let c = '.';
+    function animate() {
+        if (i < 6) {
+            console.clear();
+            console.log(c);
+            i++;
+            if (c === '...') {
+                c = '.';
+            } else {
+                c = c + '.';
+            }
+            setTimeout(animate, 1000); // Atraso de 1000ms (1 segundo)
+        } else {
+            showMenu(); // Chama showMenu() após a animação terminar
+        }
+    }
+    animate();
+    break;
+    }
+
+}
+
 async function showMenu() {
     const { option } = await inquirer.prompt([
         {
@@ -16,6 +62,8 @@ async function showMenu() {
             name: 'option',
             message: "Escolha uma opçao",
             choices: [
+                'WINDOWS',
+                'LINUX',
                 '1-Data e Hora',
                 '2-Uso do Disco',
                 '3-Uso da Memoria',
@@ -26,6 +74,9 @@ async function showMenu() {
             ]
         }
     ])
+
+    console.log('Bem vindo ao SYSTEM MONITOR')
+    console.log('Escolha o seu sistema operacional (windows/linux)')
 
     switch (option) {
         case '1-Data e Hora':
@@ -84,4 +135,4 @@ async function showMenu() {
     setTimeout(showMenu, 2000)
 }
 
-showMenu()
+escolherSistema()
