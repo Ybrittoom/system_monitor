@@ -3,6 +3,6 @@
   "dependencies": {
     "chalk": "^5.4.1",
     "figlet": "^1.8.0",
-    "inquirer": "^12.4.1"
+    "inquirer": "^12.4.3"
   }
 }
