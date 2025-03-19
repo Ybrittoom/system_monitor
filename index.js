@@ -87,7 +87,7 @@ async function sistemForLinux() {
                 '4-Temperatura',
                 '5-Uso da CPU',
                 '6-Processos em Execuçao',
-                '7-Saire'
+                '7-Sair'
             ]
         }
     ])
@@ -98,16 +98,37 @@ async function sistemForLinux() {
     switch (option) {
         case '1-Data e Hora':
             console.log(chalk.green(`\nData e Hora: ${new Date().toLocaleDateString()}`))
+            setTimeout(sistemForLinux, 2000)
+
             break
         case '2-Uso do Disco':
             exec('df -h', (err, stdout) => {
                 if (err) console.log(chalk.red('Erro ao obter informações do disco.'))
                 else console.log(chalk.yellow(`\n${stdout}`))
             })
+            setTimeout(sistemForLinux, 2000)
+
             break
         case '3-Uso da Memoria':
+            const totalMemoryGB = os.totalmem() / 1e9;
+            const freeMemoryGB = os.freemem() / 1e9;
+            const usedMemoryGB = totalMemoryGB - freeMemoryGB;
+
             console.log(chalk.cyan(`\nMemória Total: ${(os.totalmem() / 1e9).toFixed(2)} GB`));
             console.log(chalk.cyan(`Memória Livre: ${(os.freemem() / 1e9).toFixed(2)} GB`));
+
+            if (usedMemoryGB > 15) {
+                console.log(chalk.red('A memoria esta sendo muito usada. ‼️'))
+            } else if (usedMemoryGB >= 8) {
+                console.log(chalk.yellow('Uso da memoria esta medio. ⚠️'))
+            } else if (usedMemoryGB >= 1) {
+                console.log(chalk.green('Uso de memória baixo. ✅'));
+            } else {
+                console.log(chalk.green('Uso de memória muito baixo. ✅')); // Adicionado para casos < 1GB
+            }
+
+            setTimeout(sistemForLinux, 2000)
+
             break;
 
         case '4-Temperatura':
@@ -115,6 +136,8 @@ async function sistemForLinux() {
                 if (err) console.log(chalk.red('Erro ao obter a temperatura.'));
                 else console.log(chalk.magenta(`\nTemperatura: ${stdout.trim()}°C`));
             });
+            setTimeout(sistemForLinux, 2000)
+
             break
 
         case '5-Uso da CPU':
@@ -138,18 +161,21 @@ async function sistemForLinux() {
                     }
                 }
             });
+            setTimeout(sistemForLinux, 2000)
+
             break;
         case '6-Processos em Execuçao':
             exec('ps aux --sort=-%mem | head -10', (err, stdout) => {
                 if (err) console.error(chalk.red('Erro ao obter processos.'))
                 else console.log(chalk.blue(`\n${stdout}`))
             })
+            setTimeout(sistemForLinux, 2000)
+
             break
         case '7-Sair':
             console.log(chalk.red('\nSaindo...'))
             process.exit()
     }
-    setTimeout(sistemForLinux, 2000)
 }
 
 
@@ -164,7 +190,7 @@ async function sistemForWindows() {
             choices: [
                 '1-Data e Hora',
                 '2-Uso do Disco',
-                '3-Uso da Memória',
+                '3-Uso da Memoria',
                 '4-Uso da CPU',
                 '5-Processos em Execução',
                 '6-Sair'
@@ -175,6 +201,7 @@ async function sistemForWindows() {
     switch (option) {
         case '1-Data e Hora':
             console.log(chalk.green(`\nData e Hora: ${new Date().toLocaleDateString()}`));
+            setTimeout(sistemForWindows, 2000);
             break;
         
         case '2-Uso do Disco':
@@ -195,8 +222,52 @@ async function sistemForWindows() {
                     });
                 }
             });
+            setTimeout(sistemForWindows, 2000);
             break;
+            
+            case '3-Uso da Memoria':
+                console.log(chalk.cyan(`\nMemoria Total: ${(os.totalmem() / 1e9).toFixed(2)} GB`))
+                console.log(chalk.cyan(`Memória Livre: ${(os.freemem() / 1e9).toFixed(2)} GB`));
+                setTimeout(sistemForWindows, 2000);
+                break
+
+            case '4-Uso da CPU':
+                exec('wmic cpu get LoadPercentage', (err, stdout) => {
+                    if (err) {
+                        console.log(chalk.red('Erro ao obter uso da CPU.'));
+                    } else {
+                        const lines = stdout.trim().split('\n').slice(1);
+                        const usoCPU = parseFloat(lines[0]);
+    
+                        console.log(chalk.blue(`\nCPU: ${os.cpus()[0].model}`));
+                        console.log(chalk.blue(`Núcleos: ${os.cpus().length}`));
+                        console.log(chalk.green(`Uso da CPU: ${usoCPU}%`));
+    
+                        if (usoCPU >= 70 && usoCPU <= 100) {
+                            console.log(chalk.redBright('O uso da CPU está alto! 🚨'));
+                        } else if (usoCPU >= 50 && usoCPU < 70) {
+                            console.log(chalk.yellow('O uso da CPU está mediano. ⚠️'));
+                        } else {
+                            console.log(chalk.green('O uso da CPU está normal. ✅'));
+                        }
+                    }
+                    setTimeout(sistemForWindows, 2000);
+                });
+                break
+
+            case '5-Processos em Execuçao':
+                exec('tasklist', (err, stdout) => {
+                    if (err) console.error(chalk.red('Erro ao obter processos.'));
+                    else console.log(chalk.blue(`\n${stdout}`));
+                    setTimeout(sistemForWindows, 2000);
+                });
+                break;
+
+            case '6-Sair':
+                console.log(chalk.red('n\Saindo...'))
+                process.exit()
     }
+    
 }
 
 escolherSistema()
